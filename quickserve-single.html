@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>QuickServe — Single File</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAQAAABl7S6cAAAArUlEQVR4nO3SQQ3CMBQF0V0i1xJr8z2qg3QqgHh8F2Yz0Vg2m5x8hQq8mQ5d2y7i8zvS7y0gAAAAAAAAAAAD4y8rC2r8w9n5a8i4q6H2r3b9gQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kQ0eFZ5kYHf7w5d9r2y9m3AAAAAAAAAAAAwE9QBRzR8eE3w5cAAAAASUVORK5CYII=">
+<style>
+  :root{
+    --bg:#0b1220; --panel:#111827; --muted:#6b7280; --accent:#0ea5a4; --accent-2:#14b8a6;
+    --text:#f9fafb; --text-soft:#d1d5db; --danger:#ef4444; --border:#1f2937; --chip:#1f2937; --card:#0f172a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,var(--bg),#0a0f1a 45%,#0b1324 100%);color:var(--text);
+       font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica Neue,Arial}
+  header{display:flex;gap:.75rem;align-items:center;padding:1rem;background:linear-gradient(90deg,rgba(20,184,166,.15),rgba(14,165,164,.05));border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+  header h1{font-size:1.05rem;margin:0}
+  header .spacer{flex:1}
+  header .btn{background:var(--accent);border:none;color:white;padding:.6rem .9rem;border-radius:.6rem;font-weight:600}
+  header .btn.secondary{background:#111827;color:var(--text-soft);border:1px solid var(--border)}
+  main{display:grid;grid-template-columns:260px 1fr 360px;gap:1rem;padding:1rem;max-width:1400px;margin:0 auto}
+  @media(max-width:1100px){main{grid-template-columns:1fr}}
+  section.panel{background:rgba(17,24,39,.7);border:1px solid var(--border);border-radius:1rem;padding:1rem}
+  #categoryList button{display:block;width:100%;text-align:left;padding:.65rem .75rem;border:1px solid var(--border);border-radius:.6rem;background:var(--chip);color:var(--text-soft);margin:.35rem 0}
+  #categoryList button.active{background:var(--accent);color:white;border-color:transparent;font-weight:700}
+  .row{display:flex;gap:.5rem;align-items:center}
+  .row input[type="text"], .row input[type="number"]{width:100%;padding:.6rem .7rem;border-radius:.6rem;border:1px solid var(--border);background:#0b1324;color:var(--text)}
+  .hint{color:var(--muted);font-size:.85rem}
+  #itemsGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
+  .card{background:linear-gradient(180deg,var(--card),#0d1528);border:1px solid var(--border);border-radius:.9rem;padding:.8rem;display:flex;flex-direction:column;gap:.3rem}
+  .card h4{margin:.2rem 0 .1rem 0;font-size:1rem}
+  .price{color:var(--accent-2);font-weight:700}
+  .muted{color:var(--muted)}
+  .card button{margin-top:.4rem;padding:.5rem .7rem;border-radius:.6rem;border:1px solid var(--border);background:var(--chip);color:var(--text-soft)}
+  #cartList .li{padding:.6rem;border:1px solid var(--border);border-radius:.6rem;background:#0b1324;margin:.35rem 0;display:flex;gap:.5rem;justify-content:space-between}
+  .qtybox{display:flex;gap:.35rem;align-items:center}
+  .qtybox button{padding:.4rem .55rem;border-radius:.5rem;border:1px solid var(--border);background:var(--chip);color:var(--text-soft)}
+  .small-note{font-size:.85rem;color:var(--muted)}
+  .totals{border-top:1px dashed var(--border);padding-top:.75rem;margin-top:.75rem}
+  .totals .row{justify-content:space-between}
+  .totals .sum{font-weight:800;font-size:1.1rem}
+  .chip{display:inline-flex;gap:.4rem;align-items:center;padding:.35rem .5rem;border-radius:.6rem;background:var(--chip);border:1px solid var(--border);color:var(--text-soft);font-size:.85rem}
+  details.mod{border:1px dashed var(--border);border-radius:.6rem;padding:.35rem .5rem;background:rgba(255,255,255,.02);margin-top:.35rem}
+  .mod-options{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.25rem}
+  .mod-options label{display:inline-flex;gap:.35rem;align-items:center;border:1px solid var(--border);background:var(--chip);border-radius:.5rem;padding:.25rem .5rem}
+  .pill{display:inline-flex;gap:.35rem;align-items:center;border:1px solid var(--border);background:var(--chip);border-radius:999px;padding:.2rem .5rem;font-size:.8rem;color:var(--text-soft)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🍽️ QuickServe — Single File</h1>
+  <div class="spacer"></div>
+  <input id="menuFile" type="file" accept="application/json" style="display:none">
+  <button class="btn secondary" id="importBtn">Import Menu</button>
+  <button class="btn secondary" id="exportBtn">Export Menu</button>
+  <button class="btn" id="newOrderBtn">New Order</button>
+</header>
+
+<main>
+  <section id="left" class="panel">
+    <div class="row"><input id="search" type="text" placeholder="Search menu…"></div>
+    <div class="row"><input id="tableName" type="text" placeholder="Table / Name"><input id="guests" type="number" min="1" value="1" style="max-width:90px"></div>
+    <div class="hint">Tap a category, then add items. Tip & tax on the right.</div>
+    <div id="categoryList"></div>
+  </section>
+
+  <section id="middle" class="panel">
+    <div class="row" style="flex-wrap:wrap;gap:.5rem">
+      <span class="chip">Restaurant: <strong id="restName" style="margin-left:.3rem"></strong></span>
+      <span class="chip">Currency: <strong id="currency"></strong></span>
+      <span class="chip">Tax: <strong id="taxRate"></strong></span>
+      <button class="btn" id="quickItem">Quick Add Custom Item</button>
+      <button class="btn" id="clearCart">Clear Cart</button>
+    </div>
+    <div id="itemsGrid"></div>
+  </section>
+
+  <section id="right" class="panel">
+    <h3 style="margin:0 0 .5rem 0">Order</h3>
+    <div id="cartList"></div>
+    <div class="row"><input id="note" type="text" placeholder="Order note (e.g., no onions on any burgers)"></div>
+    <details class="mod" style="margin-top:.5rem">
+      <summary>Tip & Tax</summary>
+      <div class="row" style="gap:.35rem;flex-wrap:wrap;margin-top:.35rem">
+        <label class="pill">Tip % <input id="tipPct" type="number" min="0" step="1" value="0" style="width:80px"></label>
+        <label class="pill">Tax % <input id="taxPct" type="number" min="0" step="0.01" value="0" style="width:100px"></label>
+        <label class="pill">Service Fee <input id="svcFee" type="number" min="0" step="0.01" value="0" style="width:120px"></label>
+      </div>
+      <div class="row" style="gap:.35rem;flex-wrap:wrap">
+        <button class="btn" data-tip="0">No tip</button><button class="btn" data-tip="10">10%</button>
+        <button class="btn" data-tip="15">15%</button><button class="btn" data-tip="18">18%</button><button class="btn" data-tip="20">20%</button>
+      </div>
+    </details>
+
+    <div class="totals">
+      <div class="row"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+      <div class="row"><span>Tax</span><strong id="taxAmt">$0.00</strong></div>
+      <div class="row"><span>Tip</span><strong id="tipAmt">$0.00</strong></div>
+      <div class="row"><span>Service Fee</span><strong id="svcAmt">$0.00</strong></div>
+      <div class="row sum"><span>Total</span><strong id="grandTotal">$0.00</strong></div>
+      <div class="row"><span>Per Guest (<span id="guestCount">1</span>)</span><strong id="perGuest">$0.00</strong></div>
+    </div>
+
+    <div class="row" style="gap:.5rem;flex-wrap:wrap;margin-top:.6rem">
+      <button class="btn" id="printBtn">Print / Share Receipt</button>
+      <button class="btn" id="saveOrderBtn">Save</button>
+      <button class="btn" id="loadOrderBtn">Load</button>
+      <button class="btn" id="closeOrderBtn">Close Order</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const fmt = (n,curr='USD') => new Intl.NumberFormat(undefined,{style:'currency',currency:curr}).format(+n||0);
+const uid = () => Math.random().toString(36).slice(2,9);
+
+const DefaultMenu = JSON.parse(localStorage.getItem('qs_menu_v1')) || {
+  restaurant:"Demo Diner", currency:"USD", taxRate:8.5, categories:[{name:"Burgers", items:[{id:"classic",name:"Classic Burger",price:9.99}]}]
+};
+
+const MenuStore = {
+  key:'qs_menu_v1', data:null,
+  load(){ try{this.data = JSON.parse(localStorage.getItem(this.key))||DefaultMenu}catch(e){this.data=DefaultMenu} return this.data; },
+  save(){ localStorage.setItem(this.key, JSON.stringify(this.data)); },
+  import(json){ this.data=json; this.save(); },
+  export(){ const a=document.createElement('a'); const blob=new Blob([JSON.stringify(this.data,null,2)],{type:'application/json'});
+             a.href=URL.createObjectURL(blob); a.download=((this.data.restaurant||'menu')+'_menu.json').toLowerCase(); a.click(); URL.revokeObjectURL(a.href); }
+};
+
+const Orders = {
+  key:'qs_orders_v1', current:null,
+  all(){ try{return JSON.parse(localStorage.getItem(this.key))||[]}catch(e){return[]} },
+  saveAll(l){ localStorage.setItem(this.key, JSON.stringify(l)); },
+  saveCurrent(){ const l=this.all(); if(!this.current){this.new()} const i=l.findIndex(x=>x.id===this.current.id); if(i>=0) l[i]=this.current; else l.push(this.current); this.saveAll(l); },
+  new(){ this.current={id:uid(), table:$('#tableName').value||'', guests:+$('#guests').value||1, note:$('#note').value||'',
+                      tipPct:+$('#tipPct').value||0, taxPct:+$('#taxPct').value||(MenuStore.data?.taxRate||0), svcFee:+$('#svcFee').value||0,
+                      createdAt:new Date().toISOString(), items:[]}; renderCart(); },
+  close(){ const l=this.all().filter(x=>x.id!==(this.current?.id)); this.saveAll(l); this.current=null; this.new(); }
+};
+
+function itemBaseById(itid){ for(const c of MenuStore.data.categories){ const f=(c.items||[]).find(i=>i.id===itid); if(f) return f;} return null;}
+function addToCart(base){ if(!Orders.current) Orders.new(); Orders.current.items.push({cartId:uid(), itemId:base.id, name:base.name, basePrice:+base.price||0, qty:1, notes:'', selections:[]}); renderCart(); }
+function adjustQty(id,d){ const it=Orders.current.items.find(i=>i.cartId===id); if(!it) return; it.qty=Math.max(1,(it.qty||1)+d); renderCart(); }
+function removeItem(id){ Orders.current.items = Orders.current.items.filter(i=>i.cartId!==id); renderCart(); }
+function setNote(id,t){ const it=Orders.current.items.find(i=>i.cartId===id); if(!it) return; it.notes=t; }
+function toggleSelection(id,group,opt,type){ const it=Orders.current.items.find(i=>i.cartId===id); if(!it) return;
+  it.selections=it.selections||[];
+  if(type==='single'){ it.selections=it.selections.filter(s=>s.group!==group); if(opt) it.selections.push({group,optionName:opt.name,price:+opt.price||0}); }
+  else{ const key=group+'::'+opt.name; const has=it.selections.find(s=>(s.group+'::'+s.optionName)===key);
+        if(has){ it.selections=it.selections.filter(s=>(s.group+'::'+s.optionName)!==key); } else { it.selections.push({group,optionName:opt.name,price:+opt.price||0}); } }
+  renderCart();
+}
+function lineTotal(it){ const sel=(it.selections||[]).reduce((a,s)=>a+(+s.price||0),0); return ((+it.basePrice||0)+sel)*(it.qty||1); }
+function calcTotals(){ const subtotal=(Orders.current?.items||[]).reduce((a,i)=>a+lineTotal(i),0);
+  const taxPct=+($('#taxPct').value||0), tipPct=+($('#tipPct').value||0), svc=+($('#svcFee').value||0);
+  const tax=subtotal*(taxPct/100), tip=subtotal*(tipPct/100), total=subtotal+tax+tip+svc; const guests=Math.max(1,+($('#guests').value||1));
+  return {subtotal,tax,tip,svc,total,perGuest:total/guests,guests}; }
+
+function renderMeta(){ $('#restName').textContent=MenuStore.data.restaurant||'Untitled'; $('#currency').textContent=MenuStore.data.currency||'USD';
+  $('#taxRate').textContent=((MenuStore.data.taxRate||0).toFixed(2))+'%'; $('#taxPct').value = Orders.current?.taxPct ?? (MenuStore.data.taxRate||0); }
+function renderCategories(active){ const list=$('#categoryList'); list.innerHTML=''; const cats=(MenuStore.data.categories||[]);
+  cats.forEach((c,i)=>{ const b=document.createElement('button'); b.textContent=c.name + ((c.items?.length)?` (${c.items.length})`:'');
+    b.className=(c.name===active||(!active && i===0))?'active':''; b.onclick=()=>{ renderCategories(c.name); renderItems(c.name, $('#search').value.trim()); }; list.appendChild(b); }); }
+function renderItems(active,q=''){ const grid=$('#itemsGrid'); grid.innerHTML=''; const cat=(MenuStore.data.categories||[]).find(c=>c.name===active)||MenuStore.data.categories?.[0];
+  if(!cat){ grid.innerHTML='<div class="muted">No items. Import a menu JSON.</div>'; return; } let items=cat.items||[];
+  if(q){ const Q=q.toLowerCase(); items=items.filter(it=>it.name.toLowerCase().includes(Q)); }
+  items.forEach(it=>{ const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`<h4>${it.name}</h4><div class="muted">${cat.name}</div><div class="price">${fmt(it.price, MenuStore.data.currency)}</div>`;
+    const btn=document.createElement('button'); btn.textContent='Add'; btn.onclick=()=>addToCart(it); card.appendChild(btn); grid.appendChild(card); }); }
+function renderCart(){ renderMeta(); const list=$('#cartList'); list.innerHTML='';
+  (Orders.current?.items||[]).forEach(it=>{ const base=itemBaseById(it.itemId)||{modifiers:[]}; const wrap=document.createElement('div'); wrap.className='li';
+    const left=document.createElement('div'); left.style.flex='1'; left.innerHTML=`<strong>${it.name}</strong><div class="small-note">${fmt(it.basePrice, MenuStore.data.currency)} base</div>`;
+    (base.modifiers||[]).forEach(g=>{ const det=document.createElement('details'); det.className='mod';
+      const chosen=(it.selections||[]).filter(s=>s.group===g.group).map(s=>s.optionName).join(', ');
+      det.innerHTML=`<summary>${g.group} ${chosen? '• '+chosen : ''}</summary><div class="mod-options"></div>`;
+      const box=det.querySelector('.mod-options'); (g.options||[]).forEach(opt=>{ const label=document.createElement('label');
+        const inp=document.createElement('input'); inp.type=(g.type==='single'?'radio':'checkbox'); inp.name='m-'+it.cartId+'-'+g.group;
+        const has=(it.selections||[]).find(s=>s.group===g.group && s.optionName===opt.name); inp.checked=!!has;
+        inp.onchange=()=>toggleSelection(it.cartId, g.group, opt, g.type); const span=document.createElement('span');
+        span.textContent=opt.name + (opt.price? ' ('+fmt(opt.price, MenuStore.data.currency)+')':'');
+        label.appendChild(inp); label.appendChild(span); box.appendChild(label); }); left.appendChild(det); });
+    const note=document.createElement('input'); note.type='text'; note.placeholder='Notes for this item'; note.value=it.notes||''; note.oninput=e=>setNote(it.cartId, e.target.value);
+    note.className='small-note'; note.style.width='100%'; note.style.marginTop='.35rem'; left.appendChild(note);
+    const right=document.createElement('div'); right.style.textAlign='right'; right.innerHTML=`
+      <div class="qtybox"><button>−</button><strong>${it.qty}</strong><button>+</button></div>
+      <div style="margin-top:.4rem"><strong>${fmt(lineTotal(it), MenuStore.data.currency)}</strong></div>
+      <div><button class="btn" style="margin-top:.35rem">Remove</button></div>`;
+    right.querySelectorAll('button')[0].onclick=()=>adjustQty(it.cartId,-1);
+    right.querySelectorAll('button')[1].onclick=()=>adjustQty(it.cartId,+1);
+    right.querySelectorAll('button')[2].onclick=()=>removeItem(it.cartId);
+    wrap.appendChild(left); wrap.appendChild(right); list.appendChild(wrap); });
+  const t=calcTotals(); $('#subtotal').textContent=fmt(t.subtotal, MenuStore.data.currency);
+  $('#taxAmt').textContent=fmt(t.tax, MenuStore.data.currency); $('#tipAmt').textContent=fmt(t.tip, MenuStore.data.currency);
+  $('#svcAmt').textContent=fmt(t.svc, MenuStore.data.currency); $('#grandTotal').textContent=fmt(t.total, MenuStore.data.currency);
+  $('#perGuest').textContent=fmt(t.perGuest, MenuStore.data.currency); $('#guestCount').textContent=t.guests; }
+
+window.addEventListener('load',()=>{ MenuStore.load(); Orders.new(); renderCategories(); renderItems(MenuStore.data.categories?.[0]?.name||''); renderCart(); });
+
+$('#search').addEventListener('input', e=>{ const q=e.target.value.trim(); const activeBtn=$('#categoryList button.active');
+  const activeName=activeBtn ? activeBtn.textContent.split(' (')[0] : (MenuStore.data.categories?.[0]?.name||''); renderItems(activeName, q); });
+
+$('#quickItem').onclick=()=>{ const name=prompt('Custom item name:'); if(!name) return; const price=parseFloat(prompt('Price (e.g., 4.50):')||'0'); addToCart({id:uid(), name, price}); };
+$('#clearCart').onclick=()=>{ if(confirm('Clear the current cart?')){ Orders.current.items=[]; renderCart(); } };
+$('#guests').addEventListener('change', renderCart); $('#tipPct').addEventListener('input', renderCart);
+$('#taxPct').addEventListener('input', renderCart); $('#svcFee').addEventListener('input', renderCart);
+$$('#right [data-tip]').forEach(b=> b.addEventListener('click', ()=>{ $('#tipPct').value=b.getAttribute('data-tip'); renderCart(); }));
+
+$('#newOrderBtn').onclick=()=>{ Orders.new(); $('#tableName').value=''; $('#note').value=''; $('#guests').value=1; renderCart(); };
+$('#saveOrderBtn').onclick=()=>{ Orders.current.table=$('#tableName').value||''; Orders.current.guests=+$('#guests').value||1; Orders.current.note=$('#note').value||'';
+  Orders.current.tipPct=+$('#tipPct').value||0; Orders.current.taxPct=+$('#taxPct').value||0; Orders.current.svcFee=+$('#svcFee').value||0; Orders.saveCurrent(); alert('Order saved.'); };
+$('#loadOrderBtn').onclick=()=>{ const list=Orders.all(); if(list.length===0){ alert('No saved orders.'); return; }
+  const options=list.map((o,i)=> `${i+1}. ${o.table||'No name'} — ${new Date(o.createdAt).toLocaleString()}`).join('\n');
+  const idx=parseInt(prompt('Choose order to load:\n'+options)||'0')-1; if(!(idx>=0 && idx<list.length)) return; Orders.current=list[idx];
+  $('#tableName').value=Orders.current.table||''; $('#guests').value=Orders.current.guests||1; $('#note').value=Orders.current.note||'';
+  $('#tipPct').value=Orders.current.tipPct||0; $('#taxPct').value=Orders.current.taxPct ?? (MenuStore.data.taxRate||0); $('#svcFee').value=Orders.current.svcFee||0; renderCart(); };
+$('#closeOrderBtn').onclick=()=>{ if(!Orders.current || Orders.current.items.length===0){ Orders.close(); alert('Order closed.'); return; }
+  if(confirm('Close and remove current order?')){ Orders.close(); $('#tableName').value=''; $('#note').value=''; $('#guests').value=1; renderCart(); } };
+
+$('#printBtn').onclick=()=>{ const o=Orders.current; const lines=[]; lines.push(MenuStore.data.restaurant||'RESTAURANT'); lines.push(new Date().toLocaleString());
+  lines.push('Table/Name: '+(o.table||'')); lines.push('Guests: '+(o.guests||1)); lines.push('');
+  for(const it of o.items){ const lt=(it.qty||1)+' × '+it.name+'  '+fmt((+it.basePrice||0) + (it.selections||[]).reduce((a,s)=>a+(+s.price||0),0), MenuStore.data.currency);
+    lines.push(lt); if((it.selections||[]).length){ (it.selections||[]).forEach(s=> lines.push('  - '+s.group+': '+s.optionName + (s.price? ' ('+fmt(s.price, MenuStore.data.currency)+')':''))); }
+    if(it.notes) lines.push('  * '+it.notes); lines.push('  = '+fmt((+it.basePrice||0 + (it.selections||[]).reduce((a,s)=>a+(+s.price||0),0))*(it.qty||1), MenuStore.data.currency)); }
+  const t=calcTotals(); lines.push(''); lines.push('Subtotal: '+fmt(t.subtotal, MenuStore.data.currency)); lines.push('Tax: '+fmt(t.tax, MenuStore.data.currency)+' ('+(+$('#taxPct').value||0)+'%)');
+  lines.push('Tip: '+fmt(t.tip, MenuStore.data.currency)+' ('+(+$('#tipPct').value||0)+'%)'); lines.push('Service Fee: '+fmt(t.svc, MenuStore.data.currency));
+  lines.push('TOTAL: '+fmt(t.total, MenuStore.data.currency)); lines.push('Per Guest: '+fmt(t.perGuest, MenuStore.data.currency)); if(o.note) lines.push('Order Note: '+o.note);
+  const w=window.open('', '_blank'); w.document.write('<pre style="font:14px/1.3 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;margin:1rem;">'+lines.join('\n')+'</pre>'); w.document.close(); w.focus(); w.print(); };
+
+$('#importBtn').onclick=()=> $('#menuFile').click();
+$('#menuFile').addEventListener('change', async (e)=>{ const f=e.target.files?.[0]; if(!f) return;
+  try{ const text=await f.text(); const json=JSON.parse(text); if(!json.categories){ alert('Invalid JSON: missing "categories"'); return; }
+    MenuStore.import(json); renderCategories(); renderItems(MenuStore.data.categories?.[0]?.name||''); renderCart(); alert('Menu imported!'); }
+  catch(err){ alert('Failed to import menu: '+err.message); } finally{ e.target.value=''; } });
+$('#exportBtn').onclick=()=> MenuStore.export();
+</script>
+</body>
+</html>
